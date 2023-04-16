@@ -1,8 +1,30 @@
 import pygame
 
 
-while True:
-    undefined
+while running:
+   
+    # Check for event if user has pushed
+    # any event in queue
+    for event in pygame.event.get():
+         
+        # if event is of type quit then set
+        # running bool to false
+        if event.type == pygame.QUIT:
+            running = False
+     
+    # set background color to our window
+    window.fill(color)
+     
+    # Update our window
+    pygame.display.flip()
+     
+    # if color is red change it to green and
+    # vice-versa
+    if(color == "red"):
+        color = "green"
+         
+    else:
+        color = "red"
 
 '''
 Player controls
