@@ -1,6 +1,8 @@
 import pygame
 
 
+screen = screen_width, screen_height = 600, 400
+
 running = True 
 
 while running:
@@ -13,6 +15,7 @@ while running:
         # running bool to false
         if event.type == pygame.QUIT:
             running = False
+            pygame.quit()
      
     # set background color to our window
     window.fill(color)
