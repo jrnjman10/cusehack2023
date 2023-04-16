@@ -4,7 +4,7 @@ pygame.init()
 
 pygame.display.set_caption('Otto Pilot')
 
-screen_width, screen_height = 600, 400
+screen_width, screen_height = 800, 600
 
 screen = pygame.display.set_mode((screen_width,screen_height))
 
@@ -23,11 +23,10 @@ class Player:
        self.y = int(y)
        self.velX = 0
        self.velY = 0
-       self.color = "blue"
+       self.color = color
        self.left = False
        self.right = False
        self.up = False
-       self.down = False
        self.speed = 4
        # Create an image of the block, and fill it with a color.
        # This could also be an image loaded from the disk.
@@ -40,14 +39,16 @@ class Player:
     def update(self):
         self.velX = 0
         self.velY = 0
+
         if self.left and not self.right:
             self.velX = -self.speed
         if self.right and not self.left:
             self.velX = self.speed
-        if self.up and not self.down:
+        if self.up:
             self.velY = -self.speed
-        if self.down and not self.up:
-            self.velY = self.speed
+        if not self.up:
+            self.velY = 0
+
         
         self.x += self.velX
         self.y += self.velY
@@ -56,6 +57,7 @@ class Player:
        # Fetch the rectangle object that has the dimensions of the image
        # Update the position of this object by setting the values of rect.x and rect.y
        #self.rect = self.image.get_rect()
+
 
 # x location, y location, img width, img height, img file
 class Platform(pygame.sprite.Sprite):
@@ -72,7 +74,7 @@ class Platform(pygame.sprite.Sprite):
 
 #Objects
 
-player = Player("green",screen_width/2,screen_height/2)
+player = Player("green",0,screen_height-32)
 
 
 
@@ -107,25 +109,30 @@ while running:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT or event.key == ord('a'):
                 player.left = True
-            if event.key == pygame.K_RIGHT or event.key == ord('d'):
+            elif event.key == pygame.K_RIGHT or event.key == ord('d'):
                 player.right = True
-            if event.key == pygame.K_UP or event.key == ord('w') or pygame.K_SPACE:
+            elif event.key == pygame.K_UP or event.key == ord('w') or pygame.K_SPACE:
                 player.up = True
-            if event.key == pygame.K_DOWN or event.key == ord('s'):
-                player.down = True
+            else:
+                print("nokey")
+            if event.key == ord('q'):
+                pygame.quit() 
+
 
 
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT or event.key == ord('a'):
                 player.left = False
-            if event.key == pygame.K_RIGHT or event.key == ord('d'):
+            elif event.key == pygame.K_RIGHT or event.key == ord('d'):
                 player.right = False
-            if event.key == pygame.K_UP or event.key == ord('w') or pygame.K_SPACE:
+            elif event.key == pygame.K_UP or event.key == ord('w') or pygame.K_SPACE:
                 player.up = False
-            if event.key == pygame.K_DOWN or event.key == ord('s'):
-                player.down = False
+            else:
+                print("nokey")
             if event.key == ord('q'):
-                pygame.quit() 
+                pygame.quit()
+
+
        
     #Draw
     screen.fill(color)
