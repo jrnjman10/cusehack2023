@@ -134,6 +134,7 @@ while running:
     # Update our window
     player.update()
     pygame.display.flip()
+    pygame.display.set_caption('Otto Pilot')
 
     clock.tick(120)
      
