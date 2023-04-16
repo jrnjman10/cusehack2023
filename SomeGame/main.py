@@ -4,90 +4,55 @@ pygame.init()
 
 pygame.display.set_caption('Otto Pilot')
 
-screen_width, screen_height = 800, 600
+screen_width, screen_height = 1080, 800
 
 screen = pygame.display.set_mode((screen_width,screen_height))
 
 playerPositionX,playerPositionY = 0, screen_height-32
 
 
+#Sources https://www.youtube.com/watch?v=B6DrRN5z_uU
 
-yGrav = 1
+PLAYER_VEL = 5
 
-jumpHeight = 20
+FPS = 60
 
-class Player:
-    # Constructor. Pass in the color of the block,
-    # and its x and y position
-    def __init__(self, color, x, y):
-       # Call the parent class (Sprite) constructor
-       pygame.sprite.Sprite.__init__(self)
-       self.rect = pygame.Rect(x,y,32,32)
-       self.x = int(x)
-       self.y = int(y)
-       self.velX = 0
-       self.velY = 0
-       self.color = color
-       self.left = False
-       self.right = False
-       self.up = False
-       self.jumping = False
-       self.speed = jumpHeight
-       # Create an image of the block, and fill it with a color.
-       # This could also be an image loaded from the disk.
-       #self.image = pygame.Surface([width, height])
-       #self.image.fill(color)
-    def draw(self, screen):
-        #could be self.image
-        pygame.draw.rect(screen, self.color, self.rect)
+class Player(pygame.sprite.Sprite):
+    color = (255,0,0)
+    GRAVITY = 1
+    def __init__(self, x,y, width, height):
+       self.rect = pygame.Rect(x, y, width, height)
+       self.x_vel = 0
+       self.y_vel = 0
+       self.mask = None
+       self.direction = "left"
+       self.animation_count = 0
+       self.fall_count = 0
 
-def update(self):
-    self.velX = 0
-
-    if self.left and not self.right:
-        self.velX = -self.speed
-    if self.right and not self.left:
-        self.velX = self.speed
-    if self.jumping:
-        print("jumping")
-        self.y -= self.velY
-        self.velY -= yGrav
-        if self.velY < -jumpHeight:
-            self.jumping = False
-            self.velY = jumpHeight
-    else:
-        self.velY -= yGrav
-        
-    self.x += self.velX
+    def move(self, dx, dy):
+        self.rect.x += dx
+        self.rect.y += dy
     
-    self.rect = pygame.Rect(self.x,self.y, 32, 32)
+    def move_left(self, vel):
+        self.x_vel = -vel
+        if self.direction != "left":
+            self.direction = "left"
+            self.animation_count = 0
+    
+    def move_right(self, vel):
+        self.x_vel = vel
+        if self.direction != "right":
+            self.direction = "right"
+            self.animation_count = 0
+    
+    def loop(self,fps):
+        self.y_vel += min(1, (self.fall_count / FPS) * self.GRAVITY)
+        self.move(self.x_vel, self.y_vel)
 
-'''
-    def update(self):
-        self.velX = 0
-        self.velY = self.speed
+        self.fall_count += 1
 
-        if self.left and not self.right:
-            self.velX = -self.speed
-        if self.right and not self.left:
-            self.velX = self.speed
-        if self.jumping:
-            print("jumping")
-            self.y -= self.velY
-            self.velY -= yGrav
-            if self.velY < -jumpHeight:
-                self.jumping = False
-                self.velY = jumpHeight
-        else:
-            self.velY = 0      
-
-
-
-
-        
-        self.x += self.velX
-        
-        self.rect = pygame.Rect(self.x,self.y, 32, 32)'''
+    def draw(self, screen):
+        pygame.draw.rect(screen, self.color, self.rect)
        # Fetch the rectangle object that has the dimensions of the image
        # Update the position of this object by setting the values of rect.x and rect.y
        #self.rect = self.image.get_rect()
@@ -108,17 +73,18 @@ class Platform(pygame.sprite.Sprite):
 
 #Objects
 
-player = Player("green",playerPositionX,playerPositionY)
 
+def draw(screen,player):
+    screen.fill(color)
+    player.draw(screen)
+    pygame.display.update()
 
-
-jumping = False
 
 
 
 running = True 
 
-color = "red"
+color = "blue"
 
 
 
@@ -126,6 +92,18 @@ color = "red"
 #player.rect.y = 32   # go to y
 
 clock = pygame.time.Clock()
+
+
+def handle_move(player):
+    keys = pygame.key.get_pressed()
+
+    player.x_vel = 0
+    if keys[pygame.K_LEFT]:
+        player.move_left(PLAYER_VEL)
+    if keys[pygame.K_RIGHT]:
+        player.move_right(PLAYER_VEL)
+
+player = Player(playerPositionX,playerPositionY,32,32)
 
 while running:
    
@@ -139,7 +117,18 @@ while running:
             running = False
             pygame.quit()
 
+    player.loop(FPS)
+    handle_move(player)
 
+    #Draw
+    draw(screen,player)
+
+    pygame.display.flip()
+    pygame.display.set_caption('Otto Pilot')
+
+    clock.tick(FPS)            
+
+'''
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT or event.key == ord('a'):
                 player.left = True
@@ -165,22 +154,10 @@ while running:
                 print("nokey")
             if event.key == ord('q'):
                 pygame.quit()
-
+'''
             
 
        
-    #Draw
-    screen.fill(color)
-    player.draw(screen)
-
-    # set background color to our window
-     
-    # Update our window
-    player.update()
-    pygame.display.flip()
-    pygame.display.set_caption('Otto Pilot')
-
-    clock.tick(120)
      
 
 '''
