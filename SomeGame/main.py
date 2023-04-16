@@ -118,6 +118,10 @@ while running:
                 player.left = False
             if event.key == pygame.K_RIGHT or event.key == ord('d'):
                 player.right = False
+            if event.key == pygame.K_UP or event.key == ord('w') or pygame.K_SPACE:
+                player.up = False
+            if event.key == pygame.K_DOWN or event.key == ord('s'):
+                player.down = False
             if event.key == ord('q'):
                 pygame.quit() 
        
