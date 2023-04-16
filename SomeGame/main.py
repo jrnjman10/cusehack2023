@@ -2,6 +2,8 @@ import pygame
 
 pygame.init()   
 
+pygame.display.set_caption('Otto Pilot')
+
 screen_width, screen_height = 600, 400
 
 screen = pygame.display.set_mode((screen_width,screen_height))
