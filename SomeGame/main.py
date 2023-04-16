@@ -1,4 +1,5 @@
 import pygame
+import pygame.image
 
 pygame.init()   
 
@@ -21,8 +22,11 @@ class Player:
     # and its x and y position
     def __init__(self, color, x, y):
        # Call the parent class (Sprite) constructor
+       self.image = pygame.image.load("Images/otto-right.png")
        pygame.sprite.Sprite.__init__(self)
-       self.rect = pygame.Rect(x,y,32,32)
+       self.size = self.image.get_size()
+       self.biggerimage = pygame.transform.scale(self.image, ((int(self.size[0])*5), (int(self.size[1])*5)))
+       self.rect = self.image.get_rect()
        self.x = int(x)
        self.y = int(y)
        self.velX = 0
@@ -33,13 +37,8 @@ class Player:
        self.up = False
        self.jumping = False
        self.speed = jumpHeight
-       # Create an image of the block, and fill it with a color.
-       # This could also be an image loaded from the disk.
-       #self.image = pygame.Surface([width, height])
-       #self.image.fill(color)
     def draw(self, screen):
-        #could be self.image
-        pygame.draw.rect(screen, self.color, self.rect)
+        screen.blit(self.biggerimage, self.rect)
 
 def update(self):
     self.velX = 0
