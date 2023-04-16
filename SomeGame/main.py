@@ -8,9 +8,13 @@ screen_width, screen_height = 800, 600
 
 screen = pygame.display.set_mode((screen_width,screen_height))
 
+playerPositionX,playerPositionY = 0, screen_height-32
 
 
 
+yGrav = 1
+
+jumpHeight = 20
 
 class Player:
     # Constructor. Pass in the color of the block,
@@ -27,7 +31,8 @@ class Player:
        self.left = False
        self.right = False
        self.up = False
-       self.speed = 4
+       self.jumping = False
+       self.speed = jumpHeight
        # Create an image of the block, and fill it with a color.
        # This could also be an image loaded from the disk.
        #self.image = pygame.Surface([width, height])
@@ -36,24 +41,53 @@ class Player:
         #could be self.image
         pygame.draw.rect(screen, self.color, self.rect)
 
+def update(self):
+    self.velX = 0
+
+    if self.left and not self.right:
+        self.velX = -self.speed
+    if self.right and not self.left:
+        self.velX = self.speed
+    if self.jumping:
+        print("jumping")
+        self.y -= self.velY
+        self.velY -= yGrav
+        if self.velY < -jumpHeight:
+            self.jumping = False
+            self.velY = jumpHeight
+    else:
+        self.velY -= yGrav
+        
+    self.x += self.velX
+    
+    self.rect = pygame.Rect(self.x,self.y, 32, 32)
+
+'''
     def update(self):
         self.velX = 0
-        self.velY = 0
+        self.velY = self.speed
 
         if self.left and not self.right:
             self.velX = -self.speed
         if self.right and not self.left:
             self.velX = self.speed
-        if self.up:
-            self.velY = -self.speed
-        if not self.up:
-            self.velY = 0
+        if self.jumping:
+            print("jumping")
+            self.y -= self.velY
+            self.velY -= yGrav
+            if self.velY < -jumpHeight:
+                self.jumping = False
+                self.velY = jumpHeight
+        else:
+            self.velY = 0      
+
+
+
 
         
         self.x += self.velX
-        self.y += self.velY
         
-        self.rect = pygame.Rect(self.x,self.y, 32, 32)
+        self.rect = pygame.Rect(self.x,self.y, 32, 32)'''
        # Fetch the rectangle object that has the dimensions of the image
        # Update the position of this object by setting the values of rect.x and rect.y
        #self.rect = self.image.get_rect()
@@ -74,11 +108,11 @@ class Platform(pygame.sprite.Sprite):
 
 #Objects
 
-player = Player("green",0,screen_height-32)
+player = Player("green",playerPositionX,playerPositionY)
 
 
 
-
+jumping = False
 
 
 
@@ -111,8 +145,8 @@ while running:
                 player.left = True
             elif event.key == pygame.K_RIGHT or event.key == ord('d'):
                 player.right = True
-            elif event.key == pygame.K_UP or event.key == ord('w') or pygame.K_SPACE:
-                player.up = True
+            elif event.key == pygame.K_UP or event.key == ord('w') or pygame.K_SPACE and not jumping:
+                player.jumping = True
             else:
                 print("nokey")
             if event.key == ord('q'):
@@ -132,6 +166,7 @@ while running:
             if event.key == ord('q'):
                 pygame.quit()
 
+            
 
        
     #Draw
