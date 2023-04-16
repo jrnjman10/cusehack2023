@@ -122,10 +122,11 @@ while running:
                 pygame.quit() 
        
     #Draw
+    screen.fill(color)
     player.draw(screen)
 
     # set background color to our window
-    screen.fill(color) 
+     
     # Update our window
     player.update()
     pygame.display.flip()
