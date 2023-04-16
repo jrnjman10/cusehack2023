@@ -1,6 +1,8 @@
 import pygame
 
 
+running = True 
+
 while running:
    
     # Check for event if user has pushed
