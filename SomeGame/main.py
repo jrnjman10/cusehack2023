@@ -1,9 +1,14 @@
 import pygame
 
+pygame.init()   
 
-screen = screen_width, screen_height = 600, 400
+screen_width, screen_height = 600, 400
+
+screen = pygame.display.set_mode((screen_width,screen_height))
 
 running = True 
+
+color = "red"
 
 while running:
    
@@ -18,7 +23,7 @@ while running:
             pygame.quit()
      
     # set background color to our window
-    window.fill(color)
+    screen.fill(color)
      
     # Update our window
     pygame.display.flip()
