@@ -1,4 +1,6 @@
 import pygame
+from os import listdir
+from os.path import isfile, join
 
 pygame.init()   
 
@@ -17,10 +19,19 @@ PLAYER_VEL = 5
 
 FPS = 60
 
+def get_block(size):
+    path = join("SomeGame", "Images", "Terrain", "Terrain.png")
+    image = pygame.image.load(path).convert_alpha()     #For some reason the mask isn't working on this image
+    surface = pygame.Surface((size,size), pygame.SRCALPHA, 32)
+    rect = pygame.Rect(96,0,size,size)
+    surface.blit(image,(0,0),rect)
+    return pygame.transform.scale2x(surface)
+
 class Player(pygame.sprite.Sprite):
     color = (255,0,0)
     GRAVITY = 1
     def __init__(self, x,y, width, height):
+       super().__init__()
        self.rect = pygame.Rect(x, y, width, height)
        self.x_vel = 0
        self.y_vel = 0
@@ -51,6 +62,15 @@ class Player(pygame.sprite.Sprite):
 
         self.fall_count += 1
 
+    def landed(self):
+        self.fall_count = 0
+        self.y_vel = 0
+        self.jump_count = 0
+
+    def hit_head(self):
+        self.count = 0
+        self.y_vel *= -1
+
     def draw(self, screen):
         pygame.draw.rect(screen, self.color, self.rect)
        # Fetch the rectangle object that has the dimensions of the image
@@ -58,24 +78,38 @@ class Player(pygame.sprite.Sprite):
        #self.rect = self.image.get_rect()
 
 
-# x location, y location, img width, img height, img file
-class Platform(pygame.sprite.Sprite):
-    def __init__(self, xloc, yloc, imgw, imgh, img):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(os.path.join('images', img)).convert()
-        self.image.convert_alpha()
-        self.image.set_colorkey(ALPHA)
-        self.rect = self.image.get_rect()
-        self.rect.y = yloc
-        self.rect.x = xloc
+class Object(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height, name=None):
+        super().__init__()
+        self.rect = pygame.Rect(x, y, width, height)
+        self.image = pygame.Surface((width, height), pygame.SRCALPHA)
+        self.width = width
+        self.height = height
+        self.name = name
+
+    def draw(self, screen, offset_x):
+        screen.blit(self.image, (self.rect.x - offset_x, self.rect.y))
+
+
+class Block(Object):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, size, size)
+        block = get_block(size)
+        self.image.blit(block, (0, 0))
+        self.mask = pygame.mask.from_surface(self.image)
 
 
 
 #Objects
 
 
-def draw(screen,player):
+def draw(screen,player,objects):
+
     screen.fill(color)
+
+    for obj in objects:
+        obj.draw(screen, offset_x)
+
     player.draw(screen)
     pygame.display.update()
 
@@ -86,15 +120,18 @@ running = True
 
 color = "blue"
 
+#need a blocksize
+block_size = 96
 
 
-#player.rect.x = 32   # go to x
-#player.rect.y = 32   # go to y
+player = Player(playerPositionX,playerPositionY,32,32)
+floor = [Block(i * block_size, screen_height - block_size, block_size)
+        for i in range(-screen_width // block_size, (screen_width * 2) // block_size)]
 
 clock = pygame.time.Clock()
 
 
-def handle_move(player):
+def handle_move(player,objects):
     keys = pygame.key.get_pressed()
 
     player.x_vel = 0
@@ -102,8 +139,24 @@ def handle_move(player):
         player.move_left(PLAYER_VEL)
     if keys[pygame.K_RIGHT]:
         player.move_right(PLAYER_VEL)
+    
+    handle_vertical_collision(player,objects, player.y_vel)
 
-player = Player(playerPositionX,playerPositionY,32,32)
+
+def handle_vertical_collision(player, objects,dy):
+    collided_objects = []
+    for obj in objects:
+        if pygame.sprite.collide_mask(player, obj):
+            if dy > 0: 
+                player.rect.bottom = obj.rect.top
+                player.landed()
+            elif dy < 0:
+                player.rect.top = obj.rect.bottom
+                player.hit_head()
+
+        collided_objects.append(obj)
+
+    return collieded_objects
 
 while running:
    
@@ -118,10 +171,10 @@ while running:
             pygame.quit()
 
     player.loop(FPS)
-    handle_move(player)
+    handle_move(player,floor)
 
     #Draw
-    draw(screen,player)
+    draw(screen,player,floor)
 
     pygame.display.flip()
     pygame.display.set_caption('Otto Pilot')
